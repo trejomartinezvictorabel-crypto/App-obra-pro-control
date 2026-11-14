@@ -15,7 +15,7 @@ jobs:
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.27.0'
           cache: true
       - run: flutter create . --org com.albanil.app --project-name app_obra_pro --platforms=android
       - name: Ajustar SDK 35 con Python
