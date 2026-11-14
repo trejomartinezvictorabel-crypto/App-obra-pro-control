@@ -1,6 +1,6 @@
 // ============================================================================
 // OBRA PRO - Calculadora, cotizador y biblioteca de obra (100% offline)
-// Incluye: Bloqueo de PIN, Cálculos con Cuchillas, Parrilla/Alambre y Materiales
+// Incluye: Bloqueo de PIN, Cálculos (Lineales, m², m³), Cuchillas, Parrilla/Alambre
 // ============================================================================
 
 import 'dart:async';
@@ -80,10 +80,10 @@ ThemeData buildTheme() {
 
 class ItemPresupuesto {
   String concepto;
-  String tipoMedida; // m, m², m³, Pza, etc.
+  String tipoMedida;
   double cantidad;
   double precioUnitario;
-  String detalleMateriales; // Desglose de cuchillas, parrilla, alambre, etc.
+  String detalleMateriales;
 
   ItemPresupuesto({
     required this.concepto,
@@ -320,15 +320,14 @@ class _CalculadoraMedidasScreenState extends State<CalculadoraMedidasScreen> {
     double precio = double.tryParse(_precioCtrl.text) ?? 0.0;
 
     if (concepto.isNotEmpty && cantidad > 0 && precio > 0) {
-      // Generar estimación automática de acero, cuchillas, parrilla y alambre según la medida
       String desglose = '';
       if (_tipoMedidaSeleccionada.contains('Cuadrados')) {
-        double malla = cantidad; // 1 m² de malla por cada m² de losa
-        double alambre = cantidad * 0.15; // aprox 150g de alambre por m²
-        double cuchillas = cantidad * 0.8; // estimación de tramos de acero/cuchilla
+        double malla = cantidad;
+        double alambre = cantidad * 0.15;
+        double cuchillas = cantidad * 0.8;
         desglose = 'Est. Materiales: ${malla.toStringAsFixed(1)} m² malla | ${cuchillas.toStringAsFixed(1)} m. cuchillas | ${alambre.toStringAsFixed(1)} kg alambre';
       } else if (_tipoMedidaSeleccionada.contains('Cúbicos')) {
-        double varillaArmado = cantidad * 12; // varilla estimada por m³ de estructura
+        double varillaArmado = cantidad * 12;
         double alambre = cantidad * 0.8; 
         desglose = 'Est. Materiales: ${varillaArmado.toStringAsFixed(1)} m. varilla/cuchilla | ${alambre.toStringAsFixed(1)} kg alambre';
       } else {
@@ -531,7 +530,7 @@ class _CalculadoraMedidasScreenState extends State<CalculadoraMedidasScreen> {
 class BibliotecaObraScreen extends StatelessWidget {
   const BibliotecaObraScreen({super.key});
 
-  final List> etapasObra = const [
+  static const List> etapasObra = [
     {
       'etapa': '1. Excavación y Movimiento de Tierra',
       'desc': 'Cortes, cepas, retiro de escombro, nivelación y compactación de terreno.'
