@@ -1,0 +1,76 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      PERMISOS Y ANDROID 16
+      ---------------------
+      * La app NO usa internet: no se declara el permiso INTERNET en este archivo.
+        (El manifest de debug que genera Flutter lo agrega solo para hot reload;
+        el APK de release queda sin internet.)
+
+      * CÁMARA: image_picker abre la app de cámara del sistema con un Intent.
+        NO declares <uses-permission android:name="android.permission.CAMERA"/>
+        mientras no pidas el permiso en tiempo de ejecución: si lo declaras y el
+        usuario no lo ha otorgado, Android cierra la captura con
+        SecurityException. Aquí solo se declara que la cámara es opcional para
+        que la app se instale también en equipos sin cámara.
+
+      * GALERÍA / ALMACENAMIENTO: image_picker usa el Selector de Fotos de
+        Android, que no requiere permisos de lectura de almacenamiento en
+        Android 13 a 16. Las fotos elegidas se copian a la carpeta privada de
+        la app, que tampoco requiere permisos.
+
+      * COMPARTIR (WhatsApp, Bluetooth, correo): share_plus usa el menú nativo
+        y su propio FileProvider; no requiere permisos adicionales.
+    -->
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+    <application
+        android:label="Obra Pro"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true"
+        android:allowBackup="true"
+        android:usesCleartextTraffic="false">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+
+    <!-- Visibilidad de paquetes (Android 11 o superior) para abrir la cámara. -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+</manifest>
