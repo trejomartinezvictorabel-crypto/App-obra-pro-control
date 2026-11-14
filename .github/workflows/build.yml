@@ -17,10 +17,17 @@ jobs:
         with:
           flutter-version: '3.24.0'
           cache: true
-      - run: cp lib/main.dart /tmp/mi_codigo.dart || true
+      - name: Resguardar archivos personalizados
+        run: |
+          mkdir -p /tmp/backup
+          if [ -f "lib/main.dart" ]; then cp lib/main.dart /tmp/backup/; fi
+          if [ -f "pubspec.yaml" ]; then cp pubspec.yaml /tmp/backup/; fi
       - run: flutter create . --org com.albanil.app --project-name app_obra_pro --platforms=android --overwrite
-      - run: mkdir -p lib
-      - run: if [ -f "/tmp/mi_codigo.dart" ]; then cp /tmp/mi_codigo.dart lib/main.dart; fi
+      - name: Restaurar archivos personalizados
+        run: |
+          mkdir -p lib
+          if [ -f "/tmp/backup/main.dart" ]; then cp /tmp/backup/main.dart lib/main.dart; fi
+          if [ -f "/tmp/backup/pubspec.yaml" ]; then cp /tmp/backup/pubspec.yaml pubspec.yaml; fi
       - run: flutter pub get
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
