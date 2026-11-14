@@ -1,30 +1,6 @@
 // ============================================================================
 // OBRA PRO - Calculadora, cotizador y biblioteca de obra (100% offline)
 // ============================================================================
-//
-// DEPENDENCIAS (agregar en pubspec.yaml, sección dependencies):
-//
-//   dependencies:
-//     flutter:
-//       sdk: flutter
-//     shared_preferences: ^2.3.2
-//     image_picker: ^1.1.2
-//     share_plus: ^10.1.4
-//     path_provider: ^2.1.4
-//     path: ^1.9.0
-//     crypto: ^3.0.5
-//
-// ANDROID (android/app/build.gradle o build.gradle.kts):
-//   compileSdk = 36
-//   targetSdk  = 36
-//   minSdk     = 24
-//   Usa Flutter estable reciente y Java 17.
-//
-// ANDROID MANIFEST: ver el archivo AndroidManifest.xml entregado junto a este.
-//
-// Toda la información (borrador, fotos y presupuestos guardados) se guarda en
-// la memoria interna del teléfono. No se usa internet en ningún momento.
-// ============================================================================
 
 import 'dart:async';
 import 'dart:convert';
@@ -32,7 +8,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -114,7 +89,124 @@ ThemeData buildTheme() {
 }
 
 // ============================================================================
-// UTILIDADES
+// CONTROLADOR Y MODELOS
 // ============================================================================
 
-String format
+class AppController extends ChangeNotifier {
+  final SharedPreferences prefs;
+  
+  AppController._(this.prefs);
+
+  static Future<AppController> create() async {
+    final prefs = await SharedPreferences.getInstance();
+    return AppController._(prefs);
+  }
+}
+
+// ============================================================================
+// APLICACIÓN PRINCIPAL
+// ============================================================================
+
+class ObraProApp extends StatelessWidget {
+  final AppController controller;
+  const ObraProApp({super.key, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Obra Pro Control',
+      debugShowCheckedModeBanner: false,
+      theme: buildTheme(),
+      home: HomeScreen(controller: controller),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  final AppController controller;
+  const HomeScreen({super.key, required this.controller});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _precioController = TextEditingController();
+  double resultado = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Obra Pro Control'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            const Text(
+              'CALCULADORA DE MANO DE OBRA Y MATERIALES',
+              style: TextStyle(
+                color: AppColors.yellow,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _precioController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: AppColors.white),
+              decoration: const InputDecoration(
+                labelText: 'Precio manual por unidad / jornada',
+                labelStyle: TextStyle(color: AppColors.muted),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.cardBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.yellow, width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.black,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              onPressed: () {
+                setState(() {
+                  double val = double.tryParse(_precioController.text) ?? 0.0;
+                  resultado = val;
+                });
+              },
+              child: const Text(
+                'CALCULAR',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 30),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.card,
+                border: Border.all(color: AppColors.cardBorder),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'Total: \$${resultado.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
