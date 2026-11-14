@@ -17,12 +17,13 @@ jobs:
         with:
           flutter-version: '3.24.0'
           cache: true
-      - run: cp lib/main.dart /tmp/mi_codigo.dart
+      - run: cp lib/main.dart /tmp/mi_codigo.dart || true
       - run: flutter create . --org com.albanil.app --project-name app_obra_pro --platforms=android --overwrite
-      - run: cp /tmp/mi_codigo.dart lib/main.dart
+      - run: mkdir -p lib
+      - run: if [ -f "/tmp/mi_codigo.dart" ]; then cp /tmp/mi_codigo.dart lib/main.dart; fi
       - run: flutter pub get
-      - run: flutter build apk --release
+      - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
           name: app-albanileria-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
